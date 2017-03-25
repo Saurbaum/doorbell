@@ -8,12 +8,16 @@ StateController stateController;
 #define SECOND_IN_MICRO 10000
 #define THRESHOLD 30000
 
+#define TRIGGER_THREASHOLD 13
+
 int doorSwitchPin = 5;
 int bellRelayPin = 9;
 
 unsigned long lastUpdate;
 
 MicroSwitch* doorSwitch = new MicroSwitch( doorSwitchPin );
+
+int triggerCount = 0;
 
 void setup()
 {
@@ -22,13 +26,26 @@ void setup()
 	pinMode( bellRelayPin, OUTPUT );
 }
 
-void triggerBell()
+void triggerBell(unsigned long length)
 {
 	digitalWrite( bellRelayPin, 1 );
 
-	delay( 500 );
+	delay( length );
 
 	digitalWrite( bellRelayPin, 0 );
+}
+
+void triggerFancyBell()
+{
+	triggerBell( 250 ); // Shave
+	delay( 50 );
+	triggerBell( 125 ); // and
+	delay( 50 ); 
+	triggerBell( 125 ); // a
+	delay( 50 );
+	triggerBell( 125 ); // hair-
+	delay( 50 );
+	triggerBell( 125 ); // -cut
 }
 
 void loop()
@@ -42,14 +59,21 @@ void loop()
 	else {
 		updateTime = now - lastUpdate;
 	}
+
 	lastUpdate = now;
 
 	stateController.Update( updateTime );
 
 	if( doorSwitch->JustPressed() )
 	{
-		triggerBell();
+		if( triggerCount++ > TRIGGER_THREASHOLD )
+		{
+			triggerFancyBell();
+			triggerCount = 0;
+		}
+		else
+		{
+			triggerBell(1000);
+		}
 	}
-	/* add main program code here */
-
 }

@@ -27,3 +27,9 @@
 *.exe
 *.out
 *.app
+
+Debug/
+
+__vm/
+
+\.vs/doorbell/v14/
